@@ -9,9 +9,7 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.options.Validation.Required;
 import org.apache.beam.sdk.options.ValueProvider;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.View;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionView;
@@ -34,7 +32,7 @@ import java.util.Map;
  */
 public class SideInputSchema {
     // The delimiter used to split elements from external schema
-    private static final String SCHEMA_DELIMITER = "\\s+";
+    private static final String SCHEMA_DELIMITER = "\\|";
     // The delimiter used to split fields from raw records
     private static final String FIELDS_DELIMITER = ";";
 
@@ -42,7 +40,7 @@ public class SideInputSchema {
     @DefaultCoder(AvroCoder.class)
     static class Record {
 
-        HashMap<String, Object> Fields;
+        Map<String, Object> Fields;
 
         private static Object parseValue(String value, String type){
 
@@ -58,6 +56,10 @@ public class SideInputSchema {
                 default:
                     throw new IllegalStateException("Unexpected value: " + type);
             }
+        }
+
+        Record(){
+            Fields =  new HashMap<>();
         }
 
         Record(Map<Integer, Map<String, String>> schema, String[] values){
@@ -77,6 +79,10 @@ public class SideInputSchema {
         }
     }
 
+    /**
+     * Split each row in the input schema and returns a KV element. The key is the field position as
+     * key and the value is a Map of field name - type
+     */
     private static class GenerateSchema extends DoFn<String, KV<Integer, Map<String, String>>> {
         @ProcessElement
         public void ProcessElement(ProcessContext c){
@@ -115,6 +121,14 @@ public class SideInputSchema {
         return records;
     }
 
+    /**
+     * A function that takes a Pipeline, read the schema rows and convert them to a PCollectionView.
+     *
+     * <p>Concept #1: The GenerateSchema function takes the raw schema rows as String and generates a KV
+     * element for each single row. Then, all KV elements are converted into a Map View.
+     * Hence, if the schema file has n rows, the PCollectionView will have a Map of n entries.
+     *
+     */
     private static PCollectionView<Map<Integer, Map<String, String>>> generateSchemaView(
             Pipeline pipeline, Options options){
 
@@ -125,6 +139,11 @@ public class SideInputSchema {
 
     }
 
+    /**
+     * Options supported by {@link SideInputSchema}.
+     *
+     * <p>Inherits standard configuration options.
+     */
     public interface Options extends PipelineOptions {
 
         /* Input File Pattern */
