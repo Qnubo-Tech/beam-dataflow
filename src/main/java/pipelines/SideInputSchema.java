@@ -37,6 +37,16 @@ public class SideInputSchema {
     private static final String FIELDS_DELIMITER = ";";
 
 
+    /**
+     * Class used to store a row from the input table.
+     *
+     * The Fields attribute is a map between the field name and the value casted to the corresponding type.
+     *
+     * <p>Concept 3: The custom class is defined to handle each row of the input table. Within
+     * this class user-defined transformations can be applied or additional information can be stored
+     * for later processing. The @DefaultCoder annotation together with the AvroCoder.class are
+     * required for serialization.
+     */
     @DefaultCoder(AvroCoder.class)
     static class Record {
 
@@ -62,6 +72,12 @@ public class SideInputSchema {
             Fields =  new HashMap<>();
         }
 
+        /**
+         * Initialises a new Record.
+         *
+         * @parma schema The schema of the table.
+         * @param values The elements of a single row from the table.
+         */
         Record(Map<Integer, Map<String, String>> schema, String[] values){
 
             Fields = new HashMap<>();
@@ -80,8 +96,8 @@ public class SideInputSchema {
     }
 
     /**
-     * Split each row in the input schema and returns a KV element. The key is the field position as
-     * key and the value is a Map of field name - type
+     * Split each row from the input schema and returns a KV element. The key is the field position
+     * and the value is a Map of field name - type.
      */
     private static class GenerateSchema extends DoFn<String, KV<Integer, Map<String, String>>> {
         @ProcessElement
@@ -97,6 +113,14 @@ public class SideInputSchema {
         }
     }
 
+    /**
+     * A function that takes lines from the input table as String and returns custom Records based on the schema provided.
+     *
+     * <p>Concept 2: The PCollectionView which contains the schema is used here as a side input.
+     * Then, the schemaView becomes an additional input when the DoFn processes a new element from
+     * the rawLines PCollection. That means the schema can be accessed each time a new line
+     * from the input table is being processed.
+     */
     private static PCollection<Record> generateRecords(
             PCollection<String> rawLines, PCollectionView<Map<Integer, Map<String, String>>> schemaView)
     {
@@ -109,8 +133,10 @@ public class SideInputSchema {
                         String line = c.element();
                         String[] values = line.split(FIELDS_DELIMITER);
 
+                        // Get the schema as an additional input
                         Map<Integer, Map<String, String>> schema = c.sideInput(schemaView);
 
+                        // Convert the values of the row processed into a single Record object
                         Record record = new Record(schema, values);
 
                         c.output(record);
