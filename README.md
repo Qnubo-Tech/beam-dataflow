@@ -14,6 +14,6 @@ is a simple dummy pipeline that demonstrates how to use [Side Inputs](https://be
 from an external file and introduces a custom `Record` class to process inside a PCollection.
 
 2. [`SpannerIngester`](https://github.com/Qnubo-Tech/beam-dataflow/blob/master/src/main/java/pipelines/SpannerIngester.java)
-is a pipeline that writes an external file into Storage. The pipeline can be reused from one table to another thanks to
+is a pipeline that writes an external file into Spanner. The pipeline can be reused from one table to another thanks to
 custom Record. It writes into Spanner using the [SpannerIO](https://beam.apache.org/releases/javadoc/2.19.0/org/apache/beam/sdk/io/gcp/spanner/SpannerIO.html)
-class, showing how to handle the [Mutations](https://www.javadoc.io/doc/com.google.cloud/google-cloud-spanner/latest/com/google/cloud/spanner/Mutation.html).
+class and shows how to handle the [Mutations](https://www.javadoc.io/doc/com.google.cloud/google-cloud-spanner/latest/com/google/cloud/spanner/Mutation.html).
