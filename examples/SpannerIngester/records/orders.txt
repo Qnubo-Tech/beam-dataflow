@@ -1,0 +1,4 @@
+100;50;U4BCZ;Spain;I
+100;27;HI90;England;I
+90;-30;Q12DS;Germany;I
+80;10;J5AD;Spain;D
