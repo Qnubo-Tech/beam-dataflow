@@ -55,9 +55,9 @@ public class SideInputSchema {
         private static Object parseValue(String value, String type){
 
             switch (type) {
-                case "INTEGER":
+                case "INT64":
                     return Long.parseLong(value);
-                case "FLOAT":
+                case "FLOAT64":
                     return Double.parseDouble(value);
                 case "DATE":
                     return LocalDate.parse(value);
