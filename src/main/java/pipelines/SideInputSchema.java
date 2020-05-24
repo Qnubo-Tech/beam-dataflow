@@ -125,7 +125,7 @@ public class SideInputSchema {
             PCollection<String> rawLines, PCollectionView<Map<Integer, Map<String, String>>> schemaView)
     {
         PCollection<Record> records = rawLines.apply(
-                "GenerateDictRowFromLines", ParDo.of(new DoFn<String, Record>() {
+                "GenerateRecordFromLines", ParDo.of(new DoFn<String, Record>() {
 
                     @ProcessElement
                     public void ProcessElement(ProcessContext c) {
