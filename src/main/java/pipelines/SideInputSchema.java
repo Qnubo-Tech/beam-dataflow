@@ -42,7 +42,7 @@ public class SideInputSchema {
      *
      * The Fields attribute is a map between the field name and the value casted to the corresponding type.
      *
-     * <p>Concept 3: The custom class is defined to handle each row of the input table. Within
+     * <p>Concept #3: The custom class is defined to handle each row of the input table. Within
      * this class user-defined transformations can be applied or additional information can be stored
      * for later processing. The @DefaultCoder annotation together with the AvroCoder.class are
      * required for serialization.
@@ -97,7 +97,7 @@ public class SideInputSchema {
 
     /**
      * Split each row from the input schema and returns a KV element. The key is the field position
-     * and the value is a Map of field name - type.
+     * and the value is a Map containing the field name and type.
      */
     private static class GenerateSchema extends DoFn<String, KV<Integer, Map<String, String>>> {
         @ProcessElement
@@ -116,7 +116,7 @@ public class SideInputSchema {
     /**
      * A function that takes lines from the input table as String and returns custom Records based on the schema provided.
      *
-     * <p>Concept 2: The PCollectionView which contains the schema is used here as a side input.
+     * <p>Concept #2: The PCollectionView which contains the schema is used here as a side input.
      * Then, the schemaView becomes an additional input when the DoFn processes a new element from
      * the rawLines PCollection. That means the schema can be accessed each time a new line
      * from the input table is being processed.
@@ -125,7 +125,7 @@ public class SideInputSchema {
             PCollection<String> rawLines, PCollectionView<Map<Integer, Map<String, String>>> schemaView)
     {
         PCollection<Record> records = rawLines.apply(
-                "GenerateRecordFromLines", ParDo.of(new DoFn<String, Record>() {
+                "GenerateRecordsFromLines", ParDo.of(new DoFn<String, Record>() {
 
                     @ProcessElement
                     public void ProcessElement(ProcessContext c) {
